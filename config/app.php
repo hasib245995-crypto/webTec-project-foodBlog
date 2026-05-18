@@ -1,8 +1,13 @@
 <?php
+// ── Start session (matches your format)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 define('BASE_URL', '/food_blog');
 define('UPLOAD_DIR', __DIR__ . '/../uploads/');
-define('MENU_UPLOAD_DIR', __DIR__ . '/../uploads/menu/');
-define('PROFILE_UPLOAD_DIR', __DIR__ . '/../uploads/profiles/');
+define('MENU_UPLOAD_DIR', UPLOAD_DIR . 'menu/');
+define('PROFILE_UPLOAD_DIR', UPLOAD_DIR . 'profiles/');
 define('MAX_FILE_SIZE', 2 * 1024 * 1024); // 2MB
 
 function redirect(string $path): void {
@@ -40,10 +45,12 @@ function requireMember(): void {
     }
 }
 
-function h($str): string {
-    return htmlspecialchars((string)$str, ENT_QUOTES, 'UTF-8');
+// ── HTML escaping
+function h(string $str): string {
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
 
+// ── CSRF protection
 function generateCsrfToken(): string {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -59,6 +66,7 @@ function csrfField(): string {
     return '<input type="hidden" name="csrf_token" value="' . h(generateCsrfToken()) . '">';
 }
 
+// ── Flash messages
 function setFlash(string $type, string $message): void {
     $_SESSION['flash'] = ['type' => $type, 'message' => $message];
 }
@@ -72,21 +80,29 @@ function getFlash(): ?array {
     return null;
 }
 
-function jsonResponse(array $data, int $code = 200): void {
-    http_response_code($code);
+function jsonResponse(array $data, int $statusCode = 200): void {
+    http_response_code($statusCode);
     header('Content-Type: application/json');
     echo json_encode($data);
     exit;
 }
 
+// ── File upload helper    
 function uploadFile(array $file, string $dest_dir, string $prefix = ''): string|false {
-    $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if ($file['error'] !== UPLOAD_ERR_OK) return false;
+    if (!is_dir($dest_dir)) mkdir($dest_dir, 0755, true);
+
+    $allowed_types = ['image/jpeg', 'image/png'];
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file['tmp_name']);
+
     if (!in_array($mime, $allowed_types)) return false;
     if ($file['size'] > MAX_FILE_SIZE) return false;
+
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = $prefix . bin2hex(random_bytes(8)) . '.' . $ext;
+
     if (!move_uploaded_file($file['tmp_name'], $dest_dir . $filename)) return false;
+
     return $filename;
 }

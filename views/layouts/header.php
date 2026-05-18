@@ -17,11 +17,7 @@
       <?php if (isAdmin()): ?>
         <a href="<?= BASE_URL ?>/admin/dashboard">Admin</a>
       <?php endif; ?>
-      <a href="<?= BASE_URL ?>/auth/profile"><?php if (!empty($_SESSION['name'])): ?>
-    Profile (<?= h($_SESSION['name']) ?>)
-<?php else: ?>
-    <a href="<?= BASE_URL ?>/login">Login</a>
-<?php endif; ?></a>
+      <a href="<?= BASE_URL ?>/auth/profile">Profile (<?= h($_SESSION['name']) ?>)</a>
       <a href="<?= BASE_URL ?>/auth/logout" onclick="return confirm('Log out?')">Logout</a>
     <?php else: ?>
       <a href="<?= BASE_URL ?>/auth/login">Login</a>

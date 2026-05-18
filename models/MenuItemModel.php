@@ -2,54 +2,129 @@
 require_once __DIR__ . '/../config/database.php';
 
 class MenuItemModel {
-    private PDO $db;
-    public function __construct() { $this->db = getDB(); }
+    private mysqli $db;
 
+    public function __construct() {
+        $this->db = getDB();
+    }
+
+    //Get all menu items of a restaurant
     public function getByRestaurant(int $restaurantId): array {
-        $s = $this->db->prepare("SELECT * FROM menu_items WHERE restaurant_id=? ORDER BY created_at DESC");
-        $s->execute([$restaurantId]);
-        return $s->fetchAll();
+        $stmt = mysqli_prepare(
+            $this->db,
+            "SELECT * FROM menu_items WHERE restaurant_id = ? ORDER BY created_at DESC"
+        );
+        mysqli_stmt_bind_param($stmt, "i", $restaurantId);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        mysqli_stmt_close($stmt);
+        return $items;
     }
 
+    //Find menu item by ID (with restaurant info)
     public function findById(int $id): ?array {
-        $s = $this->db->prepare("SELECT mi.*, r.name AS restaurant_name, r.id AS restaurant_id FROM menu_items mi JOIN restaurants r ON r.id=mi.restaurant_id WHERE mi.id=? LIMIT 1");
-        $s->execute([$id]);
-        return $s->fetch() ?: null;
+        $stmt = mysqli_prepare(
+            $this->db,
+            "SELECT mi.*, r.name AS restaurant_name, r.id AS restaurant_id
+             FROM menu_items mi
+             JOIN restaurants r ON r.id = mi.restaurant_id
+             WHERE mi.id = ? LIMIT 1"
+        );
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $item = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+        return $item ?: null;
     }
 
+    //Create new menu item
     public function create(array $data): int {
-        $s = $this->db->prepare("INSERT INTO menu_items (restaurant_id,name,description,price,image_path) VALUES (?,?,?,?,?)");
-        $s->execute([$data['restaurant_id'], $data['name'], $data['description'], $data['price'], $data['image_path'] ?? null]);
-        return (int)$this->db->lastInsertId();
+        $imagePath = $data['image_path'] ?? null;
+
+        $stmt = mysqli_prepare(
+            $this->db,
+            "INSERT INTO menu_items (restaurant_id, name, description, price, image_path)
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        mysqli_stmt_bind_param(
+            $stmt,
+            "issds",
+            $data['restaurant_id'],
+            $data['name'],
+            $data['description'],
+            $data['price'],
+            $imagePath
+        );
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+
+        return mysqli_insert_id($this->db);
     }
 
+    //Update existing menu item
     public function update(int $id, array $data): void {
         if (!empty($data['image_path'])) {
-            $s = $this->db->prepare("UPDATE menu_items SET name=?,description=?,price=?,image_path=? WHERE id=?");
-            $s->execute([$data['name'], $data['description'], $data['price'], $data['image_path'], $id]);
+            $stmt = mysqli_prepare(
+                $this->db,
+                "UPDATE menu_items
+                 SET name = ?, description = ?, price = ?, image_path = ?
+                 WHERE id = ?"
+            );
+            mysqli_stmt_bind_param(
+                $stmt,
+                "ssdsi",
+                $data['name'],
+                $data['description'],
+                $data['price'],
+                $data['image_path'],
+                $id
+            );
         } else {
-            $s = $this->db->prepare("UPDATE menu_items SET name=?,description=?,price=? WHERE id=?");
-            $s->execute([$data['name'], $data['description'], $data['price'], $id]);
+            $stmt = mysqli_prepare(
+                $this->db,
+                "UPDATE menu_items
+                 SET name = ?, description = ?, price = ?
+                 WHERE id = ?"
+            );
+            mysqli_stmt_bind_param(
+                $stmt,
+                "ssdi",
+                $data['name'],
+                $data['description'],
+                $data['price'],
+                $id
+            );
         }
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
     }
 
+    //Delete menu item
     public function delete(int $id): void {
-        $s = $this->db->prepare("DELETE FROM menu_items WHERE id=?");
-        $s->execute([$id]);
+        $stmt = mysqli_prepare($this->db, "DELETE FROM menu_items WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
     }
 
+    //Count total menu items (for dashboard)
     public function count(): int {
-        return (int)$this->db->query("SELECT COUNT(*) FROM menu_items")->fetchColumn();
+        $result = mysqli_query($this->db, "SELECT COUNT(*) AS total FROM menu_items");
+        $row = mysqli_fetch_assoc($result);
+        return (int)$row['total'];
     }
 
-    public function search(string $q): array {
-        $like = "%$q%";
-        $s = $this->db->prepare("SELECT mi.*, r.name AS restaurant_name FROM menu_items mi JOIN restaurants r ON r.id=mi.restaurant_id WHERE mi.name LIKE ? OR mi.description LIKE ? ORDER BY mi.name");
-        $s->execute([$like, $like]);
-        return $s->fetchAll();
-    }
-
+    //Get all menu items (with restaurant info)
     public function getAll(): array {
-        return $this->db->query("SELECT mi.*, r.name AS restaurant_name FROM menu_items mi JOIN restaurants r ON r.id=mi.restaurant_id ORDER BY mi.created_at DESC")->fetchAll();
+        $result = mysqli_query(
+            $this->db,
+            "SELECT mi.*, r.name AS restaurant_name
+             FROM menu_items mi
+             JOIN restaurants r ON r.id = mi.restaurant_id
+             ORDER BY mi.created_at DESC"
+        );
+        return mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
 }

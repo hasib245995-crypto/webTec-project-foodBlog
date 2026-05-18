@@ -1,4 +1,3 @@
--- Food Blog Database Schema
 CREATE DATABASE IF NOT EXISTS food_blog CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE food_blog;
 
