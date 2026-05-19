@@ -1,127 +1,94 @@
-# Food Blog - XAMPP Ready
+# FoodBlog
 
-This version has been reorganized so it can run directly from XAMPP `htdocs`.
+## Overview
 
-## 1. Copy the folder
-Place the whole folder here:
+FoodBlog is an **online food blogging platform** that allows users to explore restaurants, browse menu items, and share food experiences. The platform supports three types of users:
 
-```text
-C:\xampp\htdocs\food_blog
-```
+* **ADMIN** – Manages the platform, including restaurants, menu items, members, and content moderation.
+* **MEMBER** – Registered users who can browse restaurants, post reviews, and interact on the "Food Experience" page.
+* **VISITOR** – Unregistered users who can view restaurants, menu items, and blog posts but cannot post or comment.
 
-Your final path should look like this:
+The platform is designed to deliver a **clean, responsive, and interactive user experience** for food enthusiasts.
 
-```text
-C:\xampp\htdocs\food_blog\index.php
-```
+## Team & Tasks
 
-## 2. Start XAMPP
-Start both:
+| Student ID | Task   | Main Features                                                       |
+| ---------- | ------ | ------------------------------------------------------------------- |
+| 23-53246-3 | Task 1 | User Authentication, Registration, Profile, Home Page, Basic Browse |
+| 23-55710-3 | Task 2 | Admin: Restaurant & Menu Item Management (Full CRUD)                |
+| 23-53996-3 | Task 3 | Member: Browse, Search & Filtering, Post/Delete Reviews             |
+| 23-50895-1 | Task 4 | Food Experience Page, Admin Removal of Members & Comments           |
 
-- Apache
-- MySQL
+## Features
 
-## 3. Import the database
-Open phpMyAdmin:
+### User Management
 
-```text
-http://localhost/phpmyadmin
-```
+* Registration and login with secure password hashing and session management.
+* Role-based access control with dynamic navigation.
+* Profile management including profile picture uploads.
 
-Import this file:
+### Admin Features
 
-```text
-food_blog/config/schema.sql
-```
+* Full CRUD operations for restaurants and menu items.
+* Dashboard displaying summary statistics (restaurants, menu items, reviews, posts).
+* Content moderation: remove members, reviews, and blog posts/comments.
 
-The SQL file creates the `food_blog` database automatically.
+### Member Features
 
-## 4. Open the project
-Use this URL:
+* Browse and search restaurants and menu items using filters (location, area, cuisine, price).
+* Post, edit, and delete reviews for menu items and restaurants.
+* Comment on “Food Experience” posts.
 
-```text
-http://localhost/food_blog/
-```
+### Food Experience
 
-## 5. Default admin login
+* Members and admins can post descriptive reviews.
+* Commenting and moderation system for posts.
+* Visitors can view content in read-only mode.
 
-```text
-Email: admin@foodblog.com
-Password: Admin@1234
-```
+## Technical Details
 
-## Database settings
-The project is already configured for default XAMPP MySQL:
+* **Backend:** PHP (MVC architecture)
+* **Database:** MySQL (shared schema)
+* **Frontend:** HTML, CSS, JavaScript (AJAX support)
+* **Security:** SQL injection prevention, XSS protection, CSRF awareness
+* **Validation:** Client-side and server-side validation
+* **File Uploads:** Profile pictures and menu item images (MIME and size validation)
+* **Git Workflow:** Feature branches, meaningful commits, PR merge into protected main branch
 
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'food_blog');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-```
+## Database Schema
 
-If your MySQL root account has a password, edit:
+Key tables include:
 
-```text
-config/database.php
-```
+* `users` – User accounts
+* `restaurants` – Restaurant information
+* `menu_items` – Menu items for restaurants
+* `reviews` – Reviews on menu items
+* `food_experience_posts` – Descriptive blog posts
+* `food_experience_comments` – Comments on posts
 
-## Project structure
+## Installation
 
-```text
-food_blog/
-├── index.php              # Main router / front controller
-├── .htaccess              # Clean URL rewrite rules
-├── config/
-│   ├── app.php            # App settings and helper functions
-│   ├── database.php       # Database connection
-│   └── schema.sql         # Database schema
-├── controllers/
-├── models/
-├── views/
-├── css/
-│   └── style.css
-├── js/
-│   └── app.js
-└── uploads/
-    ├── menu/
-    └── profiles/
-```
+1. Clone the repository and navigate to the project root.
+2. Import the database schema into MySQL.
+3. Update `config/database.php` with your DB credentials.
+4. Ensure `public/uploads/` has write permissions.
+5. Run the project on a local PHP server (e.g., XAMPP).
+6. Access the application at `http://localhost/FoodBlog`.
 
-## What was fixed for XAMPP
+## Usage
 
-- Moved the front controller from `public/index.php` to `index.php`.
-- Moved `css`, `js`, and `uploads` to the project root so XAMPP can serve them easily.
-- Updated `BASE_URL` to `/food_blog`.
-- Fixed PHP include paths so they correctly load `config`, `controllers`, `models`, and `views`.
-- Added root `.htaccess` rewrite rules for clean URLs.
-- Added upload folders: `uploads/menu` and `uploads/profiles`.
-- Updated routing so URLs like `/restaurants/1/show` and `/menu-items/1/show` work.
+* Admins can log in and manage content.
+* Members can register, log in, and interact with restaurants and posts.
+* Visitors can browse restaurants, menu items, and posts without logging in.
 
-## Troubleshooting
+## Security
 
-### 404 on clean URLs
-In XAMPP, open Apache `httpd.conf` and make sure this line is enabled:
+* Passwords are stored using `password_hash()`.
+* All database queries use prepared statements.
+* Sessions are validated for role-based access control.
+* Client-side and server-side validation prevents invalid input.
 
-```apache
-LoadModule rewrite_module modules/mod_rewrite.so
-```
+## Contribution
 
-Also make sure the `htdocs` directory allows `.htaccess` overrides:
-
-```apache
-AllowOverride All
-```
-
-Restart Apache after changing the config.
-
-### Database connection error
-Check that MySQL is running and `config/database.php` matches your local database username/password.
-
-### Upload not working
-Make sure these folders exist:
-
-```text
-uploads/menu
-uploads/profiles
-```
+* Follow Git Flow: feature branches per task, at least 3 commits per student.
+* Merge completed tasks via pull requests to the main branch.
