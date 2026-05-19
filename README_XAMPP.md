@@ -1,57 +1,74 @@
-# Food Blog - XAMPP Ready
+# FoodBlog
 
-This version has been reorganized so it can run directly from XAMPP `htdocs`.
+## Overview
 
-## 1. Copy the folder
-Place the whole folder here:
+FoodBlog is an **online food blogging platform** that allows users to explore restaurants, browse menu items, and share food experiences. Users can interact with the platform based on their role:
 
-```text
+* **ADMIN** – Full control over content, users, restaurants, menu items, and moderation.
+* **MEMBER** – Registered users who can browse, post reviews, and comment on blog posts.
+* **VISITOR** – Non-registered users who can view content but cannot post or comment.
+
+The application is built with **PHP (MVC)**, **MySQL**, and **JavaScript**, and is optimized to run directly in a **XAMPP environment**.
+
+---
+
+## XAMPP Setup Instructions
+
+### 1. Copy the Project Folder
+
+Place the entire project folder in your XAMPP `htdocs` directory:
+
+```
 C:\xampp\htdocs\food_blog
 ```
 
-Your final path should look like this:
+Your main entry file should be:
 
-```text
+```
 C:\xampp\htdocs\food_blog\index.php
 ```
 
-## 2. Start XAMPP
-Start both:
+### 2. Start XAMPP
 
-- Apache
-- MySQL
+Launch the following services:
 
-## 3. Import the database
-Open phpMyAdmin:
+* Apache
+* MySQL
 
-```text
+### 3. Import the Database
+
+1. Open phpMyAdmin at:
+
+```
 http://localhost/phpmyadmin
 ```
 
-Import this file:
+2. Import the SQL file:
 
-```text
+```
 food_blog/config/schema.sql
 ```
 
-The SQL file creates the `food_blog` database automatically.
+This automatically creates the `food_blog` database with all required tables.
 
-## 4. Open the project
-Use this URL:
+### 4. Open the Project in Browser
 
-```text
+Navigate to:
+
+```
 http://localhost/food_blog/
 ```
 
-## 5. Default admin login
+### 5. Default Admin Login
 
-```text
-Email: admin@foodblog.com
-Password: Admin@1234
-```
+* Email: `admin@foodblog.com`
+* Password: `Admin@1234`
 
-## Database settings
-The project is already configured for default XAMPP MySQL:
+---
+
+## Database Configuration
+
+The project is pre-configured for XAMPP:
 
 ```php
 define('DB_HOST', 'localhost');
@@ -60,22 +77,20 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 ```
 
-If your MySQL root account has a password, edit:
+If your MySQL root account uses a password, update `config/database.php` accordingly.
 
-```text
-config/database.php
+---
+
+## Project Structure
+
 ```
-
-## Project structure
-
-```text
 food_blog/
-├── index.php              # Main router / front controller
-├── .htaccess              # Clean URL rewrite rules
+├── index.php               # Main front controller
+├── .htaccess               # Clean URL rewrite rules
 ├── config/
-│   ├── app.php            # App settings and helper functions
-│   ├── database.php       # Database connection
-│   └── schema.sql         # Database schema
+│   ├── app.php             # App settings & helper functions
+│   ├── database.php        # DB connection
+│   └── schema.sql          # Database schema
 ├── controllers/
 ├── models/
 ├── views/
@@ -88,40 +103,69 @@ food_blog/
     └── profiles/
 ```
 
-## What was fixed for XAMPP
+---
 
-- Moved the front controller from `public/index.php` to `index.php`.
-- Moved `css`, `js`, and `uploads` to the project root so XAMPP can serve them easily.
-- Updated `BASE_URL` to `/food_blog`.
-- Fixed PHP include paths so they correctly load `config`, `controllers`, `models`, and `views`.
-- Added root `.htaccess` rewrite rules for clean URLs.
-- Added upload folders: `uploads/menu` and `uploads/profiles`.
-- Updated routing so URLs like `/restaurants/1/show` and `/menu-items/1/show` work.
+## XAMPP-Specific Fixes
+
+* Moved front controller from `public/index.php` to `index.php` for easier XAMPP access.
+* CSS, JS, and upload directories relocated to project root.
+* BASE_URL updated to `/food_blog`.
+* PHP include paths corrected for config, controllers, models, and views.
+* Root `.htaccess` added for clean URLs.
+* Upload directories created: `uploads/menu` and `uploads/profiles`.
+* Routing updated so URLs like `/restaurants/1/show` and `/menu-items/1/show` work correctly.
+
+---
 
 ## Troubleshooting
 
-### 404 on clean URLs
-In XAMPP, open Apache `httpd.conf` and make sure this line is enabled:
+### 404 Errors on Clean URLs
 
-```apache
+* Ensure Apache `mod_rewrite` is enabled in `httpd.conf`:
+
+```
 LoadModule rewrite_module modules/mod_rewrite.so
 ```
 
-Also make sure the `htdocs` directory allows `.htaccess` overrides:
+* Allow `.htaccess` overrides in `htdocs`:
 
-```apache
+```
 AllowOverride All
 ```
 
-Restart Apache after changing the config.
+* Restart Apache after changes.
 
-### Database connection error
-Check that MySQL is running and `config/database.php` matches your local database username/password.
+### Database Connection Issues
 
-### Upload not working
-Make sure these folders exist:
+* Verify MySQL is running.
+* Ensure `config/database.php` credentials match your local setup.
 
-```text
+### File Upload Issues
+
+* Confirm directories exist:
+
+```
 uploads/menu
 uploads/profiles
 ```
+
+---
+
+## Features
+
+* Secure authentication and role-based access.
+* CRUD operations for restaurants and menu items (Admin).
+* Browse, search, and filter restaurants and menu items (Members & Visitors).
+* Post reviews on menu items and restaurants (Members).
+* Food Experience blog with posts and comments (Members & Admin).
+* Responsive UI and clean design.
+* Client-side and server-side input validation.
+* AJAX endpoints for dynamic content updates.
+
+---
+
+## Contribution
+
+* Follow **Git Flow**: feature branches per task.
+* Make meaningful commits (≥3 per student).
+* Merge completed tasks via pull requests to `main`.
